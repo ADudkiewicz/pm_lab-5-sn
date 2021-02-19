@@ -3,6 +3,7 @@
 #define buttonUp    11
 #define buttonOK    12
 #define buttonDown  13
+#define went 10
 #define LedRed 3
 #define LedGreen 1
 #define LedBlue 2 
@@ -43,6 +44,8 @@ void setup(void){
   pinMode(LedRed, OUTPUT);
   pinMode(LedGreen, OUTPUT);
   pinMode(LedBlue, OUTPUT);
+  pinMode(went,OUTPUT);
+  analogWrite(went,0);
 }
 
 void loop(void) {
@@ -50,6 +53,7 @@ void loop(void) {
   changeMenu();
   readTemperature();
   changeRGBLed(); 
+  runFAN();
 }
 
 void readTemperature(void){
@@ -57,6 +61,15 @@ void readTemperature(void){
   float resolution = (5.0f / 1024.0f);
   float voltage = resolution * digital;
   temperature = (voltage-0.1f) * (125.0f+40.0f) / (1.75f-0.1f) - 40.0f;
+}
+
+void runFAN(void){
+if(temperature>40.0f)
+{
+  float duty = map(temperature,40,100,100,255);
+  analogWrite(went, 255);
+}
+  else analogWrite(went, 0);
 }
 
 void dispMenu(void){
@@ -76,11 +89,4 @@ void dispMenu(void){
     lcd.print("Menu 3");
     break;
   }
-}
-
-void changeRGBLed(void){
-  float change = (temperature+40.0f) * 255.0f / (125.0f+40.0f);
-  analogWrite(LedRed, 0+change);
-  analogWrite(LedGreen,0);
-  analogWrite(LedBlue, 255-change);
 }
